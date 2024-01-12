@@ -31,7 +31,6 @@
     const fileInput = document.getElementById("file-input");
     const marginInputX = document.getElementById("margin-x");
     const marginInputY = document.getElementById("margin-y");
-    // const numCombineInput = document.getElementById("num-combine");
 
     function downloadPdf() {
       if (fileInput.files.length) {
@@ -58,7 +57,6 @@
       // Define the margin size (in inches times 72, for PDF units)
       const marginInchesX = marginInputX.value;
       const marginInchesY = marginInputY.value;
-      // const numCombine = numCombineInput.value;
 
       const marginSizeX = marginInchesX * 72;
       const marginSizeY = marginInchesY * 72;
