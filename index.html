@@ -5,22 +5,42 @@
     <script src="https://unpkg.com/downloadjs@1.4.7"></script>
   </head>
 
-  <body>
-    <input id="file-input" type="file" multiple accept="application/pdf" />
+  <body style="display: grid; place-content: center">
+    <div style="display: flex; flex-direction: column; gap: 16px">
+      <label>
+        PDF slides (select multiple for bulk) <br />
+        <input id="file-input" type="file" multiple accept="application/pdf" />
+      </label>
+
+      <label>
+        Margin on sides <br />
+        <input id="margin-x" type="number" min="0" step="0.5" value="5" />
+      </label>
+      <label>
+        Margin top & bottom <br />
+        <input id="margin-y" type="number" min="0" step="0.5" value="0" />
+      </label>
+
+      <button onclick="downloadPdf()">Download</button>
+    </div>
   </body>
 
   <script>
     const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib;
 
-    const input = document.getElementById("file-input");
-    input.addEventListener("change", () => {
-      if (input.files.length) {
-        for (const file of input.files) {
+    const fileInput = document.getElementById("file-input");
+    const marginInputX = document.getElementById("margin-x");
+    const marginInputY = document.getElementById("margin-y");
+    // const numCombineInput = document.getElementById("num-combine");
+
+    function downloadPdf() {
+      if (fileInput.files.length) {
+        for (const file of fileInput.files) {
           console.log("Adding margin: ", file);
           modifyPdf(file);
         }
       }
-    });
+    }
 
     async function modifyPdf(file) {
       // Fetch an existing PDF document
@@ -36,45 +56,19 @@
       const pages = pdfDoc.getPages();
 
       // Define the margin size (in inches times 72, for PDF units)
-      const marginInches = 5;
-      const numCombine = 2;
+      const marginInchesX = marginInputX.value;
+      const marginInchesY = marginInputY.value;
+      // const numCombine = numCombineInput.value;
 
-      const marginSize = marginInches * 72;
+      const marginSizeX = marginInchesX * 72;
+      const marginSizeY = marginInchesY * 72;
 
       pages.forEach((page) => {
         page.setSize(
-          page.getWidth() + marginSize,
-          page.getHeight() + marginSize
+          page.getWidth() + marginSizeX,
+          page.getHeight() + marginSizeY
         );
-        page.translateContent(marginSize / 2, marginSize / 2);
-      });
-      console.log(pages);
-
-      for (const [index, page] of pages.entries()) {
-        const remainder = index % numCombine;
-        if (remainder === 0) {
-          const { width, height } = page.getSize();
-          page.setSize(width, height * 2);
-          page.translateContent(0, height);
-        } else {
-          console.log(index, remainder);
-          const [embeddedPage] = await pdfDoc.embedPdf(sourcePdf, [index]);
-          const { width, height } = page.getSize();
-
-          pages[index - remainder].drawPage(embeddedPage, {
-            x: 0,
-            y: -height,
-          });
-        }
-      }
-
-      // remove pages
-      let removed = 0;
-      pages.forEach((page, i) => {
-        if (i % numCombine !== 0) {
-          pdfDoc.removePage(i - removed);
-          removed++;
-        }
+        page.translateContent(marginSizeX / 2, marginSizeY / 2);
       });
 
       // Serialize the PDFDocument to bytes (a Uint8Array)
