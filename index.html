@@ -1,0 +1,87 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+  </head>
+
+  <body>
+    <input id="file-input" type="file" multiple accept="application/pdf" />
+  </body>
+
+  <script>
+    const { degrees, PDFDocument, rgb, StandardFonts } = PDFLib;
+
+    const input = document.getElementById("file-input");
+    input.addEventListener("change", () => {
+      if (input.files.length) {
+        for (const file of input.files) {
+          console.log("Adding margin: ", file);
+          modifyPdf(file);
+        }
+      }
+    });
+
+    async function modifyPdf(file) {
+      // Fetch an existing PDF document
+      const sourcePdf = await file.arrayBuffer();
+
+      // Load a PDFDocument from the existing PDF bytes
+      const pdfDoc = await PDFDocument.load(sourcePdf);
+
+      // Embed the Helvetica font
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+      // Get the first page of the document
+      const pages = pdfDoc.getPages();
+
+      // Define the margin size (in inches times 72, for PDF units)
+      const marginInches = 5;
+      const numCombine = 2;
+
+      const marginSize = marginInches * 72;
+
+      pages.forEach((page) => {
+        page.setSize(
+          page.getWidth() + marginSize,
+          page.getHeight() + marginSize
+        );
+        page.translateContent(marginSize / 2, marginSize / 2);
+      });
+      console.log(pages);
+
+      for (const [index, page] of pages.entries()) {
+        const remainder = index % numCombine;
+        if (remainder === 0) {
+          const { width, height } = page.getSize();
+          page.setSize(width, height * 2);
+          page.translateContent(0, height);
+        } else {
+          console.log(index, remainder);
+          const [embeddedPage] = await pdfDoc.embedPdf(sourcePdf, [index]);
+          const { width, height } = page.getSize();
+
+          pages[index - remainder].drawPage(embeddedPage, {
+            x: 0,
+            y: -height,
+          });
+        }
+      }
+
+      // remove pages
+      let removed = 0;
+      pages.forEach((page, i) => {
+        if (i % numCombine !== 0) {
+          pdfDoc.removePage(i - removed);
+          removed++;
+        }
+      });
+
+      // Serialize the PDFDocument to bytes (a Uint8Array)
+      const pdfBytes = await pdfDoc.save();
+
+      // Trigger the browser to download the PDF document
+      download(pdfBytes, "modified" + file.name + ".pdf", "application/pdf");
+    }
+  </script>
+</html>
