@@ -6,10 +6,10 @@
     <script src="https://unpkg.com/downloadjs@1.4.7"></script>
   </head>
 
-  <body style="display: grid; place-content: center">
+  <body id="dropContainer" style="display: grid; place-content: center">
     <div style="display: flex; flex-direction: column; gap: 16px">
       <label>
-        PDF slides (select multiple for bulk) <br />
+        Drag & Drop PDF slides (select multiple for bulk) <br />
         <input id="file-input" type="file" multiple accept="application/pdf" />
       </label>
 
@@ -74,7 +74,32 @@
       const pdfBytes = await pdfDoc.save();
 
       // Trigger the browser to download the PDF document
-      download(pdfBytes, "modified" + file.name + ".pdf", "application/pdf");
+      download(pdfBytes, "modified-" + file.name + ".pdf", "application/pdf");
     }
+
+    const dropContainer = document.getElementById("dropContainer");
+    //https://stackoverflow.com/questions/8006715/drag-drop-files-into-standard-html-file-input
+    // dragover and dragenter events need to have 'preventDefault' called
+    // in order for the 'drop' event to register.
+    // See: https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Drag_operations#droptargets
+    dropContainer.ondragover = function (e) {
+      e.preventDefault();
+    };
+    dropContainer.ondragenter = function (e) {
+      e.preventDefault();
+    };
+
+    dropContainer.ondrop = function (e) {
+      e.preventDefault();
+
+      // pretty simple -- but not for IE :(
+      fileInput.files = e.dataTransfer.files;
+
+      // If you want to use some of the dropped files
+      const dT = new DataTransfer();
+      dT.items.add(e.dataTransfer.files[0]);
+      dT.items.add(e.dataTransfer.files[3]);
+      fileInput.files = dT.files;
+    };
   </script>
 </html>
