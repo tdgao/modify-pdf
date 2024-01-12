@@ -15,6 +15,12 @@
   <body id="dropContainer" style="display: grid; place-content: center">
     <div style="display: flex; flex-direction: column; gap: 16px">
       <h1 class="text-3xl">PDF Modifier</h1>
+      <a class="link" href="https://github.com/tdgao/modify-pdf">GitHub</a>
+      <p class="max-w-md">
+        Use printer dialog "pages per sheet" feature to print multiple slides
+        per sheet. I recommend 2 or 4 pages per sheet. Depends on how much
+        content each slide has.
+      </p>
 
       <label>
         Drag & Drop PDF slides (select multiple for bulk) <br />
@@ -50,7 +56,9 @@
         />
       </label>
 
-      <button class="btn" onclick="downloadPdf()">Download modified</button>
+      <button class="btn btn-neutral" onclick="downloadPdf()">
+        Download modified
+      </button>
     </div>
   </body>
 
