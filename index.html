@@ -4,25 +4,53 @@
     <title>PDF Modifier</title>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://unpkg.com/downloadjs@1.4.7"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.6.0/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
   </head>
 
   <body id="dropContainer" style="display: grid; place-content: center">
     <div style="display: flex; flex-direction: column; gap: 16px">
+      <h1 class="text-3xl">PDF Modifier</h1>
+
       <label>
         Drag & Drop PDF slides (select multiple for bulk) <br />
-        <input id="file-input" type="file" multiple accept="application/pdf" />
+        <input
+          class="file-input file-input-bordered"
+          id="file-input"
+          type="file"
+          multiple
+          accept="application/pdf"
+        />
       </label>
 
       <label>
         Margin on sides <br />
-        <input id="margin-x" type="number" min="0" step="0.5" value="5" />
+        <input
+          class="input input-bordered"
+          id="margin-x"
+          type="number"
+          min="0"
+          step="0.5"
+          value="5"
+        />
       </label>
       <label>
-        Margin top & bottom <br />
-        <input id="margin-y" type="number" min="0" step="0.5" value="2" />
+        Margin on top & bottom <br />
+        <input
+          class="input input-bordered"
+          id="margin-y"
+          type="number"
+          min="0"
+          step="0.5"
+          value="2"
+        />
       </label>
 
-      <button onclick="downloadPdf()">Download</button>
+      <button class="btn" onclick="downloadPdf()">Download modified</button>
     </div>
   </body>
 
